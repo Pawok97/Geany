@@ -3,6 +3,9 @@ package LZW;
 import org.junit.Test;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class Decompressor {
@@ -21,7 +24,7 @@ public class Decompressor {
         init();
         long dictSize = 256;
 
-        ArrayList<Long> compressed = (ArrayList<Long>) fileReader(new File("compression file.cb"));
+        ArrayList<Integer> compressed = (ArrayList<Integer>) fileReader(new File("compression file.cb"));
         String w = "" + (char) (long) compressed.remove(0);
         StringBuffer result = new StringBuffer(w);
 
@@ -44,40 +47,49 @@ public class Decompressor {
         fileWriter(result.toString());
     }
 
-    private List<Long> fileReader(File file) throws Exception {
-        String rs;
-        ArrayList<Long> compressed = new ArrayList<>();
+    private List<Integer> fileReader(File file) throws Exception {
+        Path path = Paths.get("compression file.cb");
+        byte[] allBytes = Files.readAllBytes(path);
+        ArrayList<Integer> integers = new ArrayList<>();
+        int counter = 0;
+        byte[] y = new byte[4];
+        for (byte a : allBytes) {
 
-        StringBuilder line = new StringBuilder("");
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-
-        while ((rs = reader.readLine()) != null) {
-            line.append(rs);
+            y[counter] = a;
+            counter++;
+            if (counter == 4) {
+                integers.add(byteArrayToInt(y));
+                counter = 0;
+            }
         }
-        String[] result=line.toString().split(",");
-        for (String i:result){
-            compressed.add(Long.parseLong(i));
+        return integers;
+    }
+        public int byteArrayToInt ( byte[] bytes){
+            int result = 0;
+            int l = bytes.length - 1;
+            for (int i = 0; i < bytes.length; i++)
+                if (i == l) result += bytes[i] << i * 8;
+                else result += (bytes[i] & 0xFF) << i * 8;
+            return result;
         }
-        return compressed;
-    }
 
-    private void fileWriter(String line) throws Exception {
-        FileWriter writer = new FileWriter(new File("decompression file.cb"));
-        writer.write(line);
-        writer.flush();
-    }
+        private void fileWriter (String line) throws Exception {
+            FileWriter writer = new FileWriter(new File("decompression file.cb"));
+            writer.write(line);
+            writer.flush();
+        }
 
-    @Test
-    public void main() throws Exception {
+        @Test
+        public void main () throws Exception {
 //        short[] buffer={82,69,68,256,258,257,259,262,261,264,260,266,263,267,265,268,271,270,273,269,266};
 
-        Decompressor decompressor = new Decompressor();
-        decompressor.unpack();
+            Decompressor decompressor = new Decompressor();
+            decompressor.unpack();
 //        for (short i:buffer){
 //            integers.add((int) i);
-    }
+        }
 //        System.out.println(decompress(integers));
 //        integers=fileReader(new File("compression file.cb"));
 //        System.out.println(unpack(integers));
 //    }
-}
+    }

@@ -53,11 +53,12 @@ public class FileHandler {
 
 
     private List<String> readFile() throws Exception {
-        Scanner scanner=new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("enter file name:");
+        String name = scanner.nextLine();
 
 
-
-        BufferedReader reader = new BufferedReader(new FileReader("file.txt"));
+        BufferedReader reader = new BufferedReader(new FileReader(name));
         StringBuilder result = new StringBuilder();
         String rs;
         ArrayList<String> list = new ArrayList<>();

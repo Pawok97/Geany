@@ -52,20 +52,27 @@ public class Compressor {
         } while (i < len - 1);
 
         tmp[k] = vector.indexOf(w);
-
-        int[] out=new int[k+1];
+        byte[] result = new byte[0];
+        byte[] bytes = new byte[0];
+        int[] out = new int[k + 1];
         for (i = 0; i <= k; i++) {
-            out[i] = '\uffff' & tmp[i];
-            line.append(out[i] + ",");
+            bytes = intToByteArray(tmp[i]);
+            result = ArrayUtils.addAll(result, bytes);
         }
-        this.fileWriter(line.toString());
+        fileWriter(result);
 
     }
 
 
-    private void fileWriter(String array) throws Exception {
-        FileOutputStream fis=new FileOutputStream(new File("compression file.cb"));
-        fis.write(array.getBytes());
+    private void fileWriter(String line) throws Exception {
+        FileOutputStream fis = new FileOutputStream(new File("compression file.cb"));
+        fis.write(line.getBytes());
+        fis.flush();
+    }
+
+    private void fileWriter(byte[] line) throws Exception {
+        FileOutputStream fis = new FileOutputStream(new File("compression file.cb"));
+        fis.write(line);
         fis.flush();
     }
 
@@ -78,35 +85,42 @@ public class Compressor {
         }
         return line.toString();
     }
+
     public  byte[] intToByteArray(int value) {
         byte[] result = new byte[4];
-        for(int i = 0; i < 4; i++) {
-            result[i] = (byte)(value & 0xFF);
+        for (int i = 0; i < 4; i++) {
+            result[i] = (byte) (value & 0xFF);
             value >>>= 8;
         }
         return result;
     }
-    public  int byteArrayToInt(byte[] bytes) {
-        int result = 0;
-        int l = bytes.length - 1;
-        for(int i = 0; i < bytes.length; i++)
-            if(i == l) result += bytes[i] << i * 8;
-            else result += (bytes[i] & 0xFF) << i * 8;
-        return result;
-    }
+
 
     @Test
     public void main() throws Exception {
-//        byte[] vectors=new byte [1];
-//        byte[] decompress=new byte[1];
-//        vectors[0]= (byte) 240;
+        int[] num = {150, 200, 5000, 4567, 2356};
+        byte[] bytes;
+
+        byte[] result = new byte[0];
+        for (int i : num) {
+            bytes =intToByteArray(i);
+            result = ArrayUtils.addAll(result, bytes);
+        }
+//        fileWriter(result);
+//        byte[] bs = fileReader(new File("compression file.cb")).getBytes();
+//        int ints=
+//        byte[] y=new byte [4];
+//        ArrayList<Integer> integers = new ArrayList<>();
+//        int counter=0;
+//        for (byte a:result){
 //
-//        fileWriter(vectors);
-//      byte[] newByte=fileReader(new File("geany.cb")).getBytes();
+//            y[counter]=a;
+//            counter++;
+//            if (counter==4){
+//                integers.add(byteArrayToInt(y));
+//                counter=0;
+//            }
 //
-//      for (byte b: newByte){
-//          System.out.println(b);
-//      }
-//      fileWriter(newByte);
+//        }
     }
 }
